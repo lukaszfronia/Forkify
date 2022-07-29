@@ -12,6 +12,25 @@ class RecipeView extends View {
     ['hashchange', 'load'].forEach(el => window.addEventListener(el, handler));
   }
 
+  addHandlerUpdateServings(handler) {
+    this._parentElement.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn--update-servings');
+      if (!btn) return;
+
+      const updateTo = +btn.dataset.updateTo;
+
+      updateTo > 0 && handler(updateTo);
+    });
+  }
+
+  addHandlerAddBookmark(handler) {
+    this._parentElement.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn--bookmark');
+      if (!btn) return;
+      handler();
+    });
+  }
+
   _generateMarkup() {
     return `
     <figure class="recipe__fig">
@@ -43,12 +62,16 @@ class RecipeView extends View {
       <span class="recipe__info-text">servings</span>
 
       <div class="recipe__info-buttons">
-        <button class="btn--tiny btn--increase-servings">
+        <button class="btn--tiny btn--update-servings" data-update-to="${
+          this._data.servings - 1
+        }">
           <svg>
             <use href="${icons}#icon-minus-circle"></use>
           </svg>
         </button>
-        <button class="btn--tiny btn--increase-servings">
+        <button class="btn--tiny btn--update-servings" data-update-to="${
+          this._data.servings + 1
+        }">
           <svg>
             <use href="${icons}#icon-plus-circle"></use>
           </svg>
@@ -59,9 +82,11 @@ class RecipeView extends View {
     <div class="recipe__user-generated">
 
     </div>
-    <button class="btn--round">
+    <button class="btn--round btn--bookmark">
       <svg class="">
-        <use href="${icons}#icon-bookmark-fill"></use>
+        <use href="${icons}#icon-bookmark${
+      this._data.bookmarked ? '-fill' : ''
+    }"></use>
       </svg>
     </button>
   </div>
@@ -70,7 +95,7 @@ class RecipeView extends View {
     <h2 class="heading--2">Recipe ingredients</h2>
     <ul class="recipe__ingredient-list">
 
-    ${this._data.ingridients.map(this._generateMarkupIngridient).join(' ')}
+    ${this._data.ingredients.map(this._generateMarkupIngredients).join(' ')}
 
   </div>
 
@@ -95,7 +120,7 @@ class RecipeView extends View {
     </a>
   </div>`;
   }
-  _generateMarkupIngridient(ing) {
+  _generateMarkupIngredients(ing) {
     return `
     <li class="recipe__ingredient">
           <svg class="recipe__icon">
